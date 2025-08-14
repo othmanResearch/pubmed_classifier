@@ -12,8 +12,17 @@ class processData(FlowSpec):
     def start(self):
         """ reads the path to json file  container directory into self.dataset"""
         self.dataset = read_input.scan_json_path( self.config.bern2_dataset)
-        annotation.filter_by_probability(self.dataset[0])
+        #annotation.filter_by_probability(self.dataset[0])
+        self.next(self.filter_tags)
+    
+    
+    @step
+    def filter_tags(self):
+        len(self.dataset)
+        self.filered_bern2_abstracts = [annotation.filter_by_probability(abstract) for abstract in self.dataset]
         self.next(self.end)
+     
+
 
 
     @step
