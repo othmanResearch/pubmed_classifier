@@ -18,6 +18,12 @@ def filter_by_probability(bern2_annotated_abstract, prob=0.95) -> None:
     return bern2_annotated_abstract
 
 def tag_no_disease_abstracts(bern2_annotated_abstract):
+    """
+    returns True if abstract contains disease tag or False otherwise
+
+    Args:
+        bern2_annotated_abstract (list): a bern2 annitation of an abstract
+    """
     annotations = bern2_annotated_abstract['annotations']
     if any(annotation['obj'] == 'disease' for annotation in annotations ):
         return True
