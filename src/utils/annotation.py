@@ -1,4 +1,7 @@
-
+from collections import Counter
+import json
+import tqdm
+import numpy as np
 
 def filter_by_probability(bern2_annotated_abstract, prob=0.95) -> None:
     """
@@ -28,4 +31,62 @@ def tag_no_disease_abstracts(bern2_annotated_abstract):
     if any(annotation['obj'] == 'disease' for annotation in annotations ):
         return True
     else:
-        return False 
+        return False
+
+def remove_overlapping_annotations(bern2_abstract_annotations):
+    """
+    Remove overlapping annotations, keeping the longest span when overlaps occur.
+    
+    Args:
+        bern2_abstract_annotations (list): List of annotations with 'span' dicts 
+            containing 'begin' and 'end' keys. This could be the 'annotations' 
+            element from BERN2 output of an abstract
+    
+    Returns:
+        list: Non-overlapping annotations.
+    """
+    # Sort annotations by span start, then by longest span (descending)
+    sorted_data = sorted(bern2_annotated_abstract, key=lambda x: (x['span']['begin'], -(x['span']['end'] - x['span']['begin'])))
+
+    result = []
+    for ann in sorted_data:
+        overlap = False
+        for kept in result:
+            if not (ann['span']['end'] <= kept['span']['begin'] or ann['span']['begin'] >= kept['span']['end']):
+                # Overlap detected
+                overlap = True
+                # If current annotation is longer, replace the kept one
+                if (ann['span']['end'] - ann['span']['begin']) > (kept['span']['end'] - kept['span']['begin']):
+                    result.remove(kept)
+                    result.append(ann)
+                break
+        if not overlap:
+            result.append(ann)
+
+    return result
+
+def insert_inline_tags(bern2_abstract, tag_style="bracket"):
+    """
+    Insert inline entity tags into text without replacing the original mention.
+
+    Args:
+        data (dict): Dictionary with 'text' and 'annotations'.
+        tag_style (str): 'bracket' -> [ENTITY], 'angle' -> <ENTITY>
+
+    Returns:
+        str: Text with inline tags added after each mention.
+    """
+    text = data["text"]
+    annotations = sorted(bern2_abstract.get("annotations", []), key=lambda x: x['span']['begin'], reverse=True)
+
+    for ann in annotations:
+        start = ann['span']['begin']
+        end = ann['span']['end']
+        obj = ann['obj'].upper()  # e.g., "GENE", "DISEASE"
+        tag = f"[{obj}]" if tag_style == "bracket" else f"<{obj}>"
+
+        # Insert the tag after the mention
+        text = text[:end] + tag + text[end:]
+
+    return text
+
