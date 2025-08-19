@@ -63,18 +63,42 @@ def remove_overlapping_annotations(bern2_abstract_annotations):
 
     return result
 
+def filter_homo_sapiens(annotations):
+    """
+    Filter annotations to keep only those with species 'NCBITaxon:9606', 
+    and update their 'obj' value to 'homo sapiens'. 
+    Other annotations with different 'obj' values are kept unchanged.
+    
+    Args:
+        annotations (list[dict]): List of annotation dictionaries.
+        
+    Returns:
+        list[dict]: Filtered and updated annotations.
+    """
+
+    filtered = []
+    for ann in annotations:
+        if ann.get("obj") == "species":
+            if ann.get("id") == ["NCBITaxon:9606"]:
+                ann = ann.copy()  # avoid mutating the original
+                ann["obj"] = "homo sapiens"
+                filtered.append(ann)
+        else:
+            filtered.append(ann)
+    return filtered
+
 def insert_inline_tags(bern2_abstract, tag_style="bracket"):
     """
     Insert inline entity tags into text without replacing the original mention.
 
     Args:
-        data (dict): Dictionary with 'text' and 'annotations'.
+        bern2_abstract (dict): Dictionary with 'text' and 'annotations'.
         tag_style (str): 'bracket' -> [ENTITY], 'angle' -> <ENTITY>
 
     Returns:
         str: Text with inline tags added after each mention.
     """
-    text = data["text"]
+    text = bern2_abstract["text"]
     annotations = sorted(bern2_abstract.get("annotations", []), key=lambda x: x['span']['begin'], reverse=True)
 
     for ann in annotations:

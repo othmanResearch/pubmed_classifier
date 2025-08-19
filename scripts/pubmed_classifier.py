@@ -28,11 +28,21 @@ class processData(FlowSpec):
     def filter_tags(self):
         """reains annotations exceeding or equals a probability cutoff """
         self.prob_filered_annotations = [annotation.filter_by_probability(abstract) for abstract in self.disease_info_abstracts]
+        self.next(self.keep_only_humans)
+
+    @step
+    def keep_only_humans(self):
+        """Remove non human species from the list of annotations"""
+        self.species_filtered_annotations =  self.prob_filered_annotations.copy()
+        for abstract in self.species_filtered_annotations:
+            abstract_annotations = abstract['annotations']
+            filtered_annotions = annotation.filter_homo_sapiens(abstract_annotations)
+            abstract['annotations'] = filtered_annotions
         self.next(self.remove_ner_overlap)
 
     @step
     def  remove_ner_overlap(self):
-        for abstract in self.prob_filered_annotations:
+        for abstract in self.species_filtered_annotations:
             abstract_annotations = abstract['annotations']
             filtered_annotions = annotation.remove_overlapping_annotations(abstract_annotations)
             abstract['annotations'] = filtered_annotions
@@ -41,6 +51,9 @@ class processData(FlowSpec):
 
     @step
     def insert_tags(self):
+        self.corpus_transformed = []
+        for abstract in self.prob_filered_annotations:
+            self.corpus_transformed.append(annotation.insert_inline_tags(abstract, tag_style = 'bracket' ))
 
         self.next(self.end)
 
