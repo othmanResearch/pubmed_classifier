@@ -28,8 +28,23 @@ class processData(FlowSpec):
     def filter_tags(self):
         """reains annotations exceeding or equals a probability cutoff """
         self.prob_filered_annotations = [annotation.filter_by_probability(abstract) for abstract in self.disease_info_abstracts]
+        self.next(self.remove_ner_overlap)
+
+    @step
+    def  remove_ner_overlap(self):
+        for abstract in self.prob_filered_annotations:
+            abstract_annotations = abstract['annotations']
+            filtered_annotions = annotation.remove_overlapping_annotations(abstract_annotations)
+            abstract['annotations'] = filtered_annotions
+
+        self.next(self.insert_tags)
+
+    @step
+    def insert_tags(self):
+
         self.next(self.end)
-     
+
+
     @step
     def end(self):
         pass
