@@ -1,7 +1,6 @@
 from collections import Counter
 import json
 import tqdm
-import numpy as np
 
 def filter_by_probability(bern2_annotated_abstract, prob=0.95) -> None:
     """
@@ -46,8 +45,7 @@ def remove_overlapping_annotations(bern2_abstract_annotations):
         list: Non-overlapping annotations.
     """
     # Sort annotations by span start, then by longest span (descending)
-    sorted_data = sorted(bern2_annotated_abstract, key=lambda x: (x['span']['begin'], -(x['span']['end'] - x['span']['begin'])))
-
+    sorted_data = sorted(bern2_abstract_annotations, key=lambda x: (x['span']['begin'], -(x['span']['end'] - x['span']['begin'])))
     result = []
     for ann in sorted_data:
         overlap = False
@@ -60,7 +58,7 @@ def remove_overlapping_annotations(bern2_abstract_annotations):
                     result.remove(kept)
                     result.append(ann)
                 break
-        if not overlap:
+        if  overlap == False:
             result.append(ann)
 
     return result
