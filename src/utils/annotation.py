@@ -1,6 +1,8 @@
 from collections import Counter
 import json
 import tqdm
+import warnings
+
 
 def filter_by_probability(bern2_annotated_abstract, prob=0.95) -> None:
     """
@@ -12,11 +14,17 @@ def filter_by_probability(bern2_annotated_abstract, prob=0.95) -> None:
         prob (float): the probability cutpff 
     """
     annotations = bern2_annotated_abstract['annotations']
-    new_annotaion = []
-    for elem in annotations :
-        if float(elem['prob']) >= prob :
-            new_annotaion.append(elem)
-    bern2_annotated_abstract['annotations'] = new_annotaion
+    new_annotation = []
+    for elem in annotations:
+        try:
+            if float(elem['prob']) >= prob :
+                new_annotation.append(elem)
+        except :
+            warnings.warn("anntation with no prob vale, will be retained by default")
+            new_annotation.append(elem)
+        finally:
+            pass
+    bern2_annotated_abstract['annotations'] = new_annotation
     return bern2_annotated_abstract
 
 def tag_no_disease_abstracts(bern2_annotated_abstract):

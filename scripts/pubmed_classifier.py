@@ -1,9 +1,16 @@
 from metaflow import FlowSpec, step, Config
 import sys
 import os
-import tqdm 
+import tqdm
+import logging
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))    # set before calling internal modules
 from utils import read_input, annotation
+
+# allow INFO level of logging
+logging.basicConfig(level=logging.INFO)
+
+
 
 class processData(FlowSpec):
 
@@ -13,20 +20,24 @@ class processData(FlowSpec):
     def start(self):
         """ reads the path to json file  container directory into self.dataset"""
         self.dataset = read_input.scan_json_path( self.config.bern2_dataset)
+        total_number = len(self.dataset)
+        logging.info(f'total number of abstracts:   {total_number}')
         self.next(self.remove_no_disease_abstracts)
     
     @step
     def remove_no_disease_abstracts(self):
         """ retains abstracts if contain disease annotation """
         self.disease_info_abstracts = []
-        for abstract in tqdm.tqdm(self.dataset):
+        for abstract in self.dataset:
             if annotation.tag_no_disease_abstracts(abstract):
                 self.disease_info_abstracts.append(abstract)
+        total_number = len(self.disease_info_abstracts)
+        logging.info(f'total number of disease entity containing abstracts:   {total_number}')
         self.next(self.filter_tags)
 
     @step
     def filter_tags(self):
-        """reains annotations exceeding or equals a probability cutoff """
+        """retains annotations exceeding or equals a probability cutoff """
         self.prob_filered_annotations = [annotation.filter_by_probability(abstract) for abstract in self.disease_info_abstracts]
         self.next(self.keep_only_humans)
 
