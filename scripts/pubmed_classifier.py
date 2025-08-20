@@ -11,7 +11,6 @@ from utils import read_input, annotation
 logging.basicConfig(level=logging.INFO)
 
 
-
 class processData(FlowSpec):
 
     config = Config("preprocess", required = True)
@@ -68,10 +67,12 @@ class processData(FlowSpec):
 
         self.next(self.end)
 
-
     @step
     def end(self):
-        pass
+        try:
+            self.config.output
+        except:
+            logging.info('no output file was processed, will proceed with default')
 
 if __name__=="__main__":
     processData()
