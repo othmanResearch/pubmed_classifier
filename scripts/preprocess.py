@@ -70,9 +70,15 @@ class processData(FlowSpec):
     @step
     def end(self):
         try:
-            self.config.output
+            output_path = self.config.output
         except:
             logging.info('no output file was processed, will proceed with default')
+            os.makedirs('./output', exist_ok=True)
+            output_path = './output/preprocessed_abtracts.txt'
+
+        with open(output_path, 'w') as file:
+            for item in self.corpus_transformed:
+                file.write(item + '\n')
 
 if __name__=="__main__":
     processData()
