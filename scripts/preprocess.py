@@ -1,4 +1,4 @@
-from metaflow import FlowSpec, step, Config
+from metaflow import FlowSpec, step, Config, Parameter
 import sys
 import os
 import tqdm
@@ -13,7 +13,9 @@ logging.basicConfig(level=logging.INFO)
 
 class processData(FlowSpec):
 
-    config = Config("preprocess", required = True)
+    config_file = Parameter('config_file')
+    config = Config("preprocess", default = config_file, required = True)
+
     
     @step
     def start(self):
