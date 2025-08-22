@@ -95,25 +95,40 @@ def filter_homo_sapiens(annotations):
             filtered.append(ann)
     return filtered
 
-def insert_inline_tags(bern2_abstract, tag_style="bracket"):
+def insert_inline_tags(bern2_abstract, tag_style="placeholder"):
     """
     Insert inline entity tags into text without replacing the original mention.
+    Bracketed annotations are replaced with safe placeholders (e.g., __GENE__).
 
     Args:
         bern2_abstract (dict): Dictionary with 'text' and 'annotations'.
-        tag_style (str): 'bracket' -> [ENTITY], 'angle' -> <ENTITY>
+        tag_style (str): 
+            'placeholder' -> __ENTITY__ (safe for tokenization)
+            'bracket' -> [ENTITY]
+            'angle' -> <ENTITY>
 
     Returns:
         str: Text with inline tags added after each mention.
     """
     text = bern2_abstract["text"]
-    annotations = sorted(bern2_abstract.get("annotations", []), key=lambda x: x['span']['begin'], reverse=True)
+    annotations = sorted(
+        bern2_abstract.get("annotations", []),
+        key=lambda x: x['span']['begin'],
+        reverse=True
+    )
 
     for ann in annotations:
         start = ann['span']['begin']
         end = ann['span']['end']
         obj = ann['obj'].upper()  # e.g., "GENE", "DISEASE"
-        tag = f"[{obj}]" if tag_style == "bracket" else f"<{obj}>"
+
+        # Determine the tag style
+        if tag_style == "placeholder":
+            tag = f"__{obj}__"
+        elif tag_style == "angle":
+            tag = f"<{obj}>"
+        else:  # default bracket
+            tag = f"[{obj}]"
 
         # Insert the tag after the mention
         text = text[:end] + tag + text[end:]

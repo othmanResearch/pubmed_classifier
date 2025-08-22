@@ -67,7 +67,7 @@ class processData(FlowSpec):
     def insert_tags(self):
         self.corpus_transformed = []
         for abstract in self.prob_filered_annotations:
-            self.corpus_transformed.append(annotation.insert_inline_tags(abstract, tag_style = 'bracket' ))
+            self.corpus_transformed.append(annotation.insert_inline_tags(abstract, tag_style = 'placeholder' ))
 
         self.next(self.end)
 
