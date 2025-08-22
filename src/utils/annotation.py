@@ -89,7 +89,7 @@ def filter_homo_sapiens(annotations):
         if ann.get("obj") == "species":
             if ann.get("id") == ["NCBITaxon:9606"]:
                 ann = ann.copy()  # avoid mutating the original
-                ann["obj"] = "homo sapiens"
+                ann["obj"] = "HOMOSAPIENS"
                 filtered.append(ann)
         else:
             filtered.append(ann)
@@ -97,8 +97,7 @@ def filter_homo_sapiens(annotations):
 
 def insert_inline_tags(bern2_abstract, tag_style="placeholder"):
     """
-    Insert inline entity tags into text without replacing the original mention.
-    Bracketed annotations are replaced with safe placeholders (e.g., __GENE__).
+    Replace entity mentions with inline tags or placeholders.
 
     Args:
         bern2_abstract (dict): Dictionary with 'text' and 'annotations'.
@@ -108,7 +107,7 @@ def insert_inline_tags(bern2_abstract, tag_style="placeholder"):
             'angle' -> <ENTITY>
 
     Returns:
-        str: Text with inline tags added after each mention.
+        str: Text with mentions replaced by their inline tags.
     """
     text = bern2_abstract["text"]
     annotations = sorted(
@@ -130,8 +129,8 @@ def insert_inline_tags(bern2_abstract, tag_style="placeholder"):
         else:  # default bracket
             tag = f"[{obj}]"
 
-        # Insert the tag after the mention
-        text = text[:end] + tag + text[end:]
+        # Replace the mention with the tag
+        text = text[:start] + tag + text[end:]
 
     return text
 

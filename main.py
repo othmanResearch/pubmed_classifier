@@ -1,6 +1,7 @@
 import argparse
 from metaflow import Runner
-import logging 
+import logging
+import os 
 
 logging.basicConfig(level = logging.INFO)
 
@@ -23,9 +24,9 @@ if __name__ == "__main__":
         if not args.config:
             logging.error(f"Required configuration is missing.")
             raise FileNotFoundError(f"Required configuration file is missing.")
-
-        with Runner('./scripts/preprocess.py', show_output=False).run(config='./config/training.json') as running:
-            pass
+        with Runner('./scripts/preprocess.py', show_output=False).run() as running:
+            if running.status == 'failed':
+                print(f'❌ {running.run} failed:')
 
 
            
