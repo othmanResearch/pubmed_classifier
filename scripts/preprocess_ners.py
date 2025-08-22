@@ -13,14 +13,16 @@ logging.basicConfig(level=logging.INFO)
 
 class processData(FlowSpec):
 
-    config_file = Parameter('config_file')
-    config = Config("preprocess", default = config_file, required = True)
+    config = Config("preprocess", default = "./config/training.json", required = True)
 
     
     @step
     def start(self):
         """ reads the path to json file  container directory into self.dataset"""
-        self.dataset = read_input.scan_json_path( self.config.bern2_dataset)
+
+        full_path = os.path.abspath(self.config.bern2_dataset)
+        print(full_path)
+        self.dataset = read_input.scan_json_path( full_path)
         total_number = len(self.dataset)
         logging.info(f'total number of abstracts:   {total_number}')
         self.next(self.remove_no_disease_abstracts)
@@ -46,7 +48,7 @@ class processData(FlowSpec):
     def keep_only_humans(self):
         """Remove non human species from the list of annotations"""
         self.species_filtered_annotations =  self.prob_filered_annotations.copy()
-        for abstract in self.species_filtered_annotations:
+        for abstract in tqdm.tqdm(self.species_filtered_annotations):
             abstract_annotations = abstract['annotations']
             filtered_annotions = annotation.filter_homo_sapiens(abstract_annotations)
             abstract['annotations'] = filtered_annotions
