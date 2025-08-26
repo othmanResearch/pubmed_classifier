@@ -13,35 +13,23 @@ logging.basicConfig(level=logging.INFO)
 
 class processData(FlowSpec):
 
-    config = Config("preprocess", default = "./config/training.json", required = True)
+    config = Config("preprocess", required = True)
 
     
     @step
     def start(self):
         """ reads the path to json file  container directory into self.dataset"""
-
         full_path = os.path.abspath(self.config.bern2_dataset)
         print(full_path)
         self.dataset = read_input.scan_json_path( full_path)
         total_number = len(self.dataset)
         logging.info(f'total number of abstracts:   {total_number}')
-        self.next(self.remove_no_disease_abstracts)
-    
-    @step
-    def remove_no_disease_abstracts(self):
-        """ retains abstracts if contain disease annotation """
-        self.disease_info_abstracts = []
-        for abstract in self.dataset:
-            if annotation.tag_no_disease_abstracts(abstract):
-                self.disease_info_abstracts.append(abstract)
-        total_number = len(self.disease_info_abstracts)
-        logging.info(f'total number of disease entity containing abstracts:   {total_number}')
         self.next(self.filter_tags)
-
+    
     @step
     def filter_tags(self):
         """retains annotations exceeding or equals a probability cutoff """
-        self.prob_filered_annotations = [annotation.filter_by_probability(abstract) for abstract in self.disease_info_abstracts]
+        self.prob_filered_annotations = [annotation.filter_by_probability(abstract) for abstract in self.dataset]
         self.next(self.keep_only_humans)
 
     @step
