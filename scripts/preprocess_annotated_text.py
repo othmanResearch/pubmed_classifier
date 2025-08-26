@@ -4,6 +4,7 @@ import sys
 import os
 import tqdm
 import logging
+import pickle
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))    # set before calling internal modules
 from utils import read_input, preprocess_text
@@ -40,13 +41,32 @@ class preprocessAnnotText(FlowSpec):
             sp_text = preprocess_text.remove_stopwords_punct(tokenized_text)
             self.list_of_processed_texts.append(sp_text)
         nb_texts = len(self.list_of_processed_texts)
-        logging.info(f'{nb_texts} texts will be saved to pickle fornmat')
+        self.next(self.join_tokens)
+
+    @step
+    def join_tokens(self):
+        self.joined_tokenized_texts = []
+        for tokenised_text in processed_text:
+            self.joined_tokenized_texts.append(' '.join(tokenised_text))
         self.next(self.end)
 
     @step
     def end(self):
-        nb_texts = len(self.list_of_processed_texts)
+        nb_texts = len(self.joined_tokenized_texts)
         logging.info(f'{nb_texts} texts will be saved to pickle fornmat')
+        
+        try:
+            output_path = self.config.output_pkl
+            logging.info(f"Will output dataset to {self.config.output_pkl}")
+        except:
+            logging.info('no output file was processed, will proceed with default')
+            os.makedirs('./output', exist_ok=True)
+            output_path = './output/text_for_ml.pkl'
+
+       
+        with open(output_path, "wb") as f:
+            pickle.dump(self.joined_tokenized_texts, f)
+
         
 
 if __name__ == "__main__": 
