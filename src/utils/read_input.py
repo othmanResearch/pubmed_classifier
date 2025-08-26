@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import pickle
 from collections import Counter
 def read_bern2_json(filepath) -> list:
     """
@@ -49,4 +50,7 @@ def extract_placeholders(text):
     
     return counts
 
-
+def read_pkl(path_to_pkl_file) -> list:
+    with open(path_to_pkl_file, 'rb') as file: 
+        data = pickle.load(file)
+    return data

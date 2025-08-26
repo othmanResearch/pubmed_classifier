@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 
 class preprocessAnnotText(FlowSpec):
     
-    config = Config('processtext', required = True)
+    config = Config('process', required = True)
 
     @step
     def start(self):
@@ -46,7 +46,7 @@ class preprocessAnnotText(FlowSpec):
     @step
     def join_tokens(self):
         self.joined_tokenized_texts = []
-        for tokenised_text in processed_text:
+        for tokenised_text in self.list_of_processed_texts:
             self.joined_tokenized_texts.append(' '.join(tokenised_text))
         self.next(self.end)
 
