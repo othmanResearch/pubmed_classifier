@@ -7,6 +7,7 @@ import os
 import tqdm
 import logging
 import numpy as np
+import pickle
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))    # set before calling internal modules
 from utils import read_input, annotation
@@ -52,7 +53,6 @@ class removeOverlap(FlowSpec):
     @step 
     def compute_cosine_matrix(self):
         self.similarity_matrix = cosine_similarity(self.X0, self.X1)
-        print(self.similarity_matrix)
         self.next(self.filter)
 
     @step
@@ -67,31 +67,60 @@ class removeOverlap(FlowSpec):
         # For each class-0 point, check if it is too similar to any class-1 point
         overlap_mask = (self.similarity_matrix.max(axis=1) < threshold)  # True = keep
         # Filter class-0 points
-        #self.filtered_class0_idx = self.class0_idx[overlap_mask]
+        self.filtered_class0_idx = self.class0_idx[overlap_mask]
         #print("Original class 0 points:", len(self.class0_idx))
         
         #print("Remaining class 0 points after removing overlaps:", len(self.filtered_class0_idx))
         # Combine with class-1 points to get the final filtered dataset
-        #filtered_idx = np.concatenate([self.filtered_class0_idx, self.class1_idx])
-        #filtered_vectorised_data = self.vectorised_data[filtered_idx]
-        #print(self.vectorised_data.shape)
-        #filtered_labels = self.labels[filtered_idx]
-
-        #array = np.array(self.processed_data)[filtered_idx]
-
-        #print("Filtered dataset shape:", filtered_vectorised_data.shape)
+        filtered_idx = np.concatenate([self.filtered_class0_idx, self.class1_idx])
+        # filter processe non vectorised data (both negative and positive)
+        filtered_data = np.array(self.processed_data)[filtered_idx]
+        # filter vectorised data both negative and positive
+        self.filtered_vectorised_data = self.vectorised_data[filtered_idx]
+        # labels corresponding to retained data willbe subsetted
+        self.retained_labels = self.labels[filtered_idx]
+        # here I select the negative data that were slected 
+        self.negative_data_filtered = filtered_data[self.retained_labels == 0]
+        logging.info(f"Number of class 0 text retained after filtering {len(self.negative_data_filtered)})")
 
         self.next(self.end)
 
     @step
     def end(self):
-        #print(self.filtered_class0_idx)
+        try:
+            output_path = self.config.output_filtered
+            logging.info(f"Will output dataset to {self.config.output_filtered}")
+        except:
+            logging.info('no output file was processed, will proceed with default')
+            os.makedirs('./output', exist_ok=True)
+            output_path = './output/text_for_ml.pkl'
+       
+        with open(output_path, "wb") as f:
+            pickle.dump(self.negative_data_filtered.tolist(), f)
+        
+        dir_path = os.path.dirname(output_path)
+        
+        try:
+            if self.config.dump_tsne == "True":
+                print(self.config.dump_tsne)
 
-        pass
+                np.savez(dir_path+"/"+"unfiltered_data.npz", array1=self.vectorised_data, array2=self.labels) 
+                np.savez(dir_path+"/"+"filtered_data.npz", array1=self.filtered_vectorised_data, array2=self.retained_labels )
+        except:
+            logging.info(f"Embeddings will not be dumped to file")
+        """ 
+        try:
+            if self.config.dump_tsne == 'True':
+                logging.info(f"Will save the embeddings to npz file ...")
+                # the npz fornats allows to stack arrays with multiple dims
+                # will oupu tthe labels and the corresponding data into one file
+                np.savez(output_path+"/"+"unfiltered_data.npz", array1=self.vectorised_data, array2=self.labels)
 
 
-
-
+        except:
+            # no data will be output 
+            pass 
+        """
 if __name__=="__main__":
     removeOverlap()
 
