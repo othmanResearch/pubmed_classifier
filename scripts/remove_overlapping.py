@@ -98,29 +98,6 @@ class removeOverlap(FlowSpec):
         with open(output_path, "wb") as f:
             pickle.dump(self.negative_data_filtered.tolist(), f)
         
-        dir_path = os.path.dirname(output_path)
-        
-        try:
-            if self.config.dump_tsne == "True":
-                print(self.config.dump_tsne)
-
-                np.savez(dir_path+"/"+"unfiltered_data.npz", array1=self.vectorised_data, array2=self.labels) 
-                np.savez(dir_path+"/"+"filtered_data.npz", array1=self.filtered_vectorised_data, array2=self.retained_labels )
-        except:
-            logging.info(f"Embeddings will not be dumped to file")
-        """ 
-        try:
-            if self.config.dump_tsne == 'True':
-                logging.info(f"Will save the embeddings to npz file ...")
-                # the npz fornats allows to stack arrays with multiple dims
-                # will oupu tthe labels and the corresponding data into one file
-                np.savez(output_path+"/"+"unfiltered_data.npz", array1=self.vectorised_data, array2=self.labels)
-
-
-        except:
-            # no data will be output 
-            pass 
-        """
 if __name__=="__main__":
     removeOverlap()
 

@@ -19,6 +19,8 @@ def scan_json_path(jsondir) -> list:
     all_entries = []
     for json in os.scandir(jsondir):
         list_of_entries = read_bern2_json(json)
+        if len(list_of_entries) > 1: 
+            print(json)
         all_entries.extend(list_of_entries)
     return all_entries
 
