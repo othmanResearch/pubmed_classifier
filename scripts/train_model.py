@@ -10,6 +10,7 @@ import tqdm
 import logging
 import numpy as np
 import joblib
+import pandas as pd 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))    # set before calling internal modules
 from utils import read_input, annotation
@@ -90,6 +91,20 @@ class rainModel(FlowSpec):
             logging.info(f'no output file was specified, will output model to {output_model}')
         
         joblib.dump(self.pipeline, output_model)
+
+        #-----------------
+        # ouptut metrics
+        # ----------------
+        try:
+           output_roc = os.path.abspath(self.config.output_roc_data)
+           logging.info(f"Output ROC data to {output_roc}")
+           df = pd.DataFrame({"y_test":self.y_test, 
+                          "y_pred":self.y_pred, 
+                          "y_proba":self.y_proba})
+           df.to_csv(output_roc, index = False)
+
+        except: 
+            logging.info("Output ROC data will not be generated")
         
 
 if __name__ == "__main__":

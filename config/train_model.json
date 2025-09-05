@@ -2,5 +2,6 @@
   "cls2":"../output_preprocessing/negative.pkl",
   "test_size":0.2,
   "random_state":56,
-  "output_model": "../output_preprocessing/text_class_predictor.pkl"
+  "output_model": "../output_preprocessing/text_class_predictor.pkl", 
+  "output_roc_data":"../output_preprocessing/probability_data.csv"
 }
