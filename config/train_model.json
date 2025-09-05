@@ -1,6 +1,6 @@
 {"cls1":"../output_preprocessing/positive.pkl",
   "cls2":"../output_preprocessing/negative.pkl",
   "test_size":0.2,
-  "random_state":56
-
+  "random_state":56,
+  "output_model": "../output_preprocessing/text_class_predictor.pkl"
 }

@@ -4,12 +4,12 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split, cross_val_score, cross_val_predict, StratifiedKFold
 from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc, roc_auc_score
-
 import sys
 import os
 import tqdm
 import logging
 import numpy as np
+import joblib
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))    # set before calling internal modules
 from utils import read_input, annotation
@@ -51,41 +51,46 @@ class rainModel(FlowSpec):
 
     @step 
     def vectorise_and_build_model(self):
-        pipeline = Pipeline([('tfidf', TfidfVectorizer(min_df=1, ngram_range=(1, 2))),
+        self.pipeline = Pipeline([('tfidf', TfidfVectorizer(min_df=2, ngram_range=(1, 3))),
                              ('clf', LogisticRegression(C=10, penalty='l2', solver='liblinear', random_state=self.random_state))
                              ])
         cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=self.random_state)
         # Accuracy scores for each fold
-        cv_scores = cross_val_score(pipeline, self.processed_data, self.labels, cv=cv, scoring='accuracy')
-        print("Cross-validation accuracies:", cv_scores)
-        print("Mean accuracy: {:.4f} ± {:.4f}".format(np.mean(cv_scores), np.std(cv_scores)))
+        cv_scores = cross_val_score(self.pipeline, self.processed_data, self.labels, cv=cv, scoring='accuracy')
+        logging.info(f"Cross-validation accuracies: {cv_scores}")
+        logging.info("Mean accuracy: {:.4f} ± {:.4f}".format(np.mean(cv_scores), np.std(cv_scores)))
         # ---------------------------
-        # Step 4: Train model
+        #  Train model
         # ---------------------------
-        pipeline.fit(self.X_train, self.y_train)
+        self.pipeline.fit(self.X_train, self.y_train)
         # Predictions
-        self.y_pred = pipeline.predict(self.X_test)
-        self.y_proba = pipeline.predict_proba(self.X_test)[:, 1]  # probability for positive class
+        self.y_pred = self.pipeline.predict(self.X_test)
+        self.y_proba = self.pipeline.predict_proba(self.X_test)[:, 1]  # probability for positive class
 
         # ---------------------------
-        # Step 5: Performance metrics
+        # Performance metrics
         # ---------------------------
-        print("\nClassification Report:")
-        print(classification_report(self.y_test, self.y_pred))
-
-        print("\nConfusion Matrix:")
-        print(confusion_matrix(self.y_test, self.y_pred))
+        logging.info("\nClassification Report:")
+        logging.info(classification_report(self.y_test, self.y_pred))
 
         roc_auc = roc_auc_score(self.y_test, self.y_proba)
-        print("\nROC AUC Score: {:.4f}".format(roc_auc))
+        logging.info("\nROC AUC Score: {:.4f}".format(roc_auc))
 
         self.next(self.end)
 
 
     @step 
     def end(self):
-
-        return
+        try:
+           output_model = os.path.abspath( self.config.output_model)
+           logging.info(f"Output model to {output_model}")
+        except :
+            os.makedirs('./output', exist_ok=True)
+            output_model = os.path.abspath('./output/model.pkl')
+            logging.info(f'no output file was specified, will output model to {output_model}')
+        
+        joblib.dump(self.pipeline, output_model)
+        
 
 if __name__ == "__main__":
     rainModel()
