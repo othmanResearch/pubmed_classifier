@@ -18,7 +18,7 @@ from utils import read_input, annotation
 # allow INFO level of logging
 logging.basicConfig(level=logging.INFO)
 
-class rainModel(FlowSpec):
+class trainModel(FlowSpec):
 
     config = Config("training", required = True)
     test_size = Parameter('test_size', default=config.test_size, help='test size proportion relative to the dataset' )
@@ -108,4 +108,4 @@ class rainModel(FlowSpec):
         
 
 if __name__ == "__main__":
-    rainModel()
+    trainModel()

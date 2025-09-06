@@ -16,10 +16,11 @@ class predictPmids(FlowSpec):
 
     @step
     def start(self):
-        """ load the data """
+        """ load the predictive model and the data """
         with open(self.config.model_path, "rb") as f:
             logging.info("Loodading the predictice model")
             self.pipeline = joblib.load(f)
+
 
         self.next(self.end)
 

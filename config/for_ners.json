@@ -1,3 +1,3 @@
-{ "bern2_dataset":"../links/sampled_disgenet_bern2_annotation",
- "output": "../output_preprocessing/positive_annotated_ners.txt"
+{ "bern2_dataset":"../links/sampple_for_training",
+ "output": "../output_preprocessing/to_predict_annotated_ners.txt"
 }

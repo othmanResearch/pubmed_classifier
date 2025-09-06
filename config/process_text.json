@@ -1,3 +1,3 @@
-{ "annotated_texts":"../output_preprocessing/positive_annotated_ners.txt", 
-  "output_pkl":"../output_preprocessing/positive.pkl"
+{ "annotated_texts":"../output_preprocessing/to_predict_annotated_ners.txt", 
+  "output_pkl":"../output_preprocessing/to_predict_annotated_ners.pkl"
 }
