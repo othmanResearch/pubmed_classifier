@@ -54,8 +54,10 @@ class processData(FlowSpec):
     @step
     def insert_tags(self):
         self.corpus_transformed = []
-        for abstract in self.prob_filered_annotations:
+        self.pmids = []
+        for abstract in self.species_filtered_annotations:            
             self.corpus_transformed.append(annotation.insert_inline_tags(abstract, tag_style = 'placeholder' ))
+            self.pmids.append(abstract["_id"])
 
         self.next(self.end)
 
@@ -69,8 +71,8 @@ class processData(FlowSpec):
             output_path = './output/preprocessed_abtracts.txt'
 
         with open(output_path, 'w') as file:
-            for item in self.corpus_transformed:
-                file.write(item + '\n')
+            for pmid,item in zip(self.pmids, self.corpus_transformed):
+                file.write(item + '\t' + pmid +'\n')
 
 if __name__=="__main__":
     processData()
