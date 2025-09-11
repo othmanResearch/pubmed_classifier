@@ -16,16 +16,23 @@ logging.basicConfig(level=logging.INFO)
 
 class preprocessAnnotText(FlowSpec):
     
-    config = Config('process', required = True)
+    config = Config('process', required = True)   
+    predict = bool( Parameter('predicting', default=False, help='Turn off if wanting to predict a dateset')) 
 
     @step
     def start(self):
-        self.annotated_texts = read_input.read_annotated_texts(self.config.annotated_texts)
+        dataset = read_input.read_annotated_texts(self.config.annotated_texts)
+        self.annotated_texts = []
+        self.pmids = []
+        for line in dataset :
+            splitted = line.split("\t")
+            self.annotated_texts.append(splitted[0])
+            self.pmids.append(splitted[1].strip())
         self.next(self.generate_place_holders)
 
     @step
     def generate_place_holders(self):
-        """ not necessary but the user can check the list of the generated annotation in the text if the will"""
+        """ not necessary but the user can check the list of the generated annotation in the text if they will"""
         with open(self.config.annotated_texts, "r", encoding="utf-8") as f:
             text = f.read()
         unique_place_holders = read_input.extract_placeholders(text)
@@ -53,7 +60,7 @@ class preprocessAnnotText(FlowSpec):
     @step
     def end(self):
         nb_texts = len(self.joined_tokenized_texts)
-        logging.info(f'{nb_texts} texts will be saved to pickle fornmat')
+        logging.info(f'{nb_texts} texts and pmids will be saved to pickle format')
         
         try:
             output_path = self.config.output_pkl
@@ -62,10 +69,10 @@ class preprocessAnnotText(FlowSpec):
             logging.info('no output file was processed, will proceed with default')
             os.makedirs('./output', exist_ok=True)
             output_path = './output/text_for_ml.pkl'
-
        
         with open(output_path, "wb") as f:
-            pickle.dump(self.joined_tokenized_texts, f)
+            # this will save both the processed texts and the pmids into one pkl object
+            pickle.dump([self.joined_tokenized_texts, self.pmids], f)
 
         
 
