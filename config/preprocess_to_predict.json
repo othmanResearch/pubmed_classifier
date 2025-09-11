@@ -1,0 +1,6 @@
+{
+"bern2_dataset":"../links/to_predict",
+"output":"../pipline_output/tp_tagged_texts.txt",
+"annotated_texts":"../pipline_output/tp_tagged_texts.txt",
+"output_pkl":"../pipline_output/tp.pkl"
+}

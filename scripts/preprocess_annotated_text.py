@@ -16,8 +16,7 @@ logging.basicConfig(level=logging.INFO)
 
 class preprocessAnnotText(FlowSpec):
     
-    config = Config('process', required = True)   
-    predict = bool( Parameter('predicting', default=False, help='Turn off if wanting to predict a dateset')) 
+    config = Config('preprocess', required = True)   
 
     @step
     def start(self):

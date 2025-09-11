@@ -1,0 +1,6 @@
+{
+"bern2_dataset":"../links/negative_dataset",
+"output":"../pipline_output/negative_tagged_texts.txt",
+"annotated_texts":"../pipline_output/negative_tagged_texts.txt",
+"output_pkl":"../pipline_output/negative.pkl"
+}

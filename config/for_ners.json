@@ -1,3 +1,0 @@
-{ "bern2_dataset":"../links/sampple_for_training",
- "output": "../output_preprocessing/to_predict_annotated_ners.txt"
-}

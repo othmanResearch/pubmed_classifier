@@ -1,0 +1,6 @@
+{
+"bern2_dataset":"../links/positive_data",
+"output":"../pipline_output/positive_tagged_texts.txt",
+"annotated_texts":"../pipline_output/positive_tagged_texts.txt",
+"output_pkl":"../pipline_output/positive.pkl"
+}

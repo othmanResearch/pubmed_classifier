@@ -26,7 +26,7 @@ class trainModel(FlowSpec):
 
     @step
     def start(self):
-        self.positive = read_input.read_pkl(self.config.cls1)
+        self.positive = read_input.read_pkl(self.config.cls1)[0] # reads only the texts not the pmids
         logging.info(f"{len(self.positive)} biomedical texts will be processed for the positive class")
         self.negative = read_input.read_pkl(self.config.cls2)
         logging.info(f"{len(self.negative)} biomedical texts will be processed for the negative class")
