@@ -20,16 +20,26 @@ class processData(FlowSpec):
     def start(self):
         """ reads the path to json file  container directory into self.dataset"""
         full_path = os.path.abspath(self.config.bern2_dataset)
-        print(full_path)
         self.dataset = read_input.scan_json_path( full_path)
         total_number = len(self.dataset)
         logging.info(f'total number of abstracts:   {total_number}')
+        self.next(self.remove_short_abstracts)
+
+    @step
+    def remove_short_abstracts(self):
+        """keep only significant cutoff with more than 50 words """
+        self.length_filterd_abstracts = []
+        for abstract in self.dataset:
+            words = abstract["text"].split()
+            if len(words) > 50:
+                self.length_filterd_abstracts.append(abstract)
+        logging.info(f"Number of retained abstracts filtered by a cutoff of 50 words: {len(self.length_filterd_abstracts)}")
         self.next(self.filter_tags)
-    
+
     @step
     def filter_tags(self):
         """retains annotations exceeding or equals a probability cutoff """
-        self.prob_filered_annotations = [annotation.filter_by_probability(abstract) for abstract in self.dataset]
+        self.prob_filered_annotations = [annotation.filter_by_probability(abstract) for abstract in self.length_filterd_abstracts]
         self.next(self.keep_only_humans)
 
     @step
@@ -60,6 +70,7 @@ class processData(FlowSpec):
             self.pmids.append(abstract["_id"])
 
         self.next(self.end)
+
 
     @step
     def end(self):
