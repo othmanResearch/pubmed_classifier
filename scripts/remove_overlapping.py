@@ -21,9 +21,11 @@ class removeOverlap(FlowSpec):
 
     @step
     def start(self):
-        self.positive = read_input.read_pkl(self.config.cls1)
+        self.positive_all = read_input.read_pkl(self.config.cls1)
+        self.positive = self.positive_all[0]
         logging.info(f"{len(self.positive)} biomedical texts will be processed for the positive class")
-        self.negative = read_input.read_pkl(self.config.cls2)
+        self.negative_all = read_input.read_pkl(self.config.cls2)
+        self.negative = self.negative_all[0]
         logging.info(f"{len(self.negative)} biomedical texts will be processed for the negative class")
         self.next(self.assign_class)
     
@@ -31,12 +33,13 @@ class removeOverlap(FlowSpec):
     def assign_class(self):
         self.processed_data = self.positive+self.negative
         self.labels = np.array(len(self.positive)*[1] + len(self.negative)*[0])
+        print(self.labels)
         self.next(self.vectirise_text_entries)
 
     @step
     def vectirise_text_entries(self):
-        """ genrate embeddings based on TF-idf, ngrams are set to (1,2)"""
-        tfidf_vectorizer = TfidfVectorizer(min_df=1, ngram_range=(1, 2))
+        """ genrate embeddings based on TF-idf, ngrams are set to (1,3)"""
+        tfidf_vectorizer = TfidfVectorizer(min_df=1, ngram_range=(1, 3))
         self.vectorised_data  = tfidf_vectorizer.fit_transform(self.processed_data) 
         self.next(self.subset_data)
 
@@ -68,9 +71,6 @@ class removeOverlap(FlowSpec):
         overlap_mask = (self.similarity_matrix.max(axis=1) < threshold)  # True = keep
         # Filter class-0 points
         self.filtered_class0_idx = self.class0_idx[overlap_mask]
-        #print("Original class 0 points:", len(self.class0_idx))
-        
-        #print("Remaining class 0 points after removing overlaps:", len(self.filtered_class0_idx))
         # Combine with class-1 points to get the final filtered dataset
         filtered_idx = np.concatenate([self.filtered_class0_idx, self.class1_idx])
         # filter processe non vectorised data (both negative and positive)
