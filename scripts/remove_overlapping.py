@@ -23,9 +23,12 @@ class removeOverlap(FlowSpec):
     def start(self):
         self.positive_all = read_input.read_pkl(self.config.cls1)
         self.positive = self.positive_all[0]
+        self.positive_pmids = self.positive_all[1]
         logging.info(f"{len(self.positive)} biomedical texts will be processed for the positive class")
         self.negative_all = read_input.read_pkl(self.config.cls2)
         self.negative = self.negative_all[0]
+        self.negative_pmids = self.negative_all[1]
+        print(len(self.negative_pmids))
         logging.info(f"{len(self.negative)} biomedical texts will be processed for the negative class")
         self.next(self.assign_class)
     
@@ -33,7 +36,6 @@ class removeOverlap(FlowSpec):
     def assign_class(self):
         self.processed_data = self.positive+self.negative
         self.labels = np.array(len(self.positive)*[1] + len(self.negative)*[0])
-        print(self.labels)
         self.next(self.vectirise_text_entries)
 
     @step
@@ -71,6 +73,7 @@ class removeOverlap(FlowSpec):
         overlap_mask = (self.similarity_matrix.max(axis=1) < threshold)  # True = keep
         # Filter class-0 points
         self.filtered_class0_idx = self.class0_idx[overlap_mask]
+        print(overlap_mask)
         # Combine with class-1 points to get the final filtered dataset
         filtered_idx = np.concatenate([self.filtered_class0_idx, self.class1_idx])
         # filter processe non vectorised data (both negative and positive)
@@ -79,6 +82,8 @@ class removeOverlap(FlowSpec):
         self.filtered_vectorised_data = self.vectorised_data[filtered_idx]
         # labels corresponding to retained data willbe subsetted
         self.retained_labels = self.labels[filtered_idx]
+        # subset aso the pmids of the negative abstracts that were selected 
+        self.selected_negative_pmids =np.array(self.negative_pmids)[overlap_mask]
         # here I select the negative data that were slected 
         self.negative_data_filtered = filtered_data[self.retained_labels == 0]
         logging.info(f"Number of class 0 text retained after filtering {len(self.negative_data_filtered)})")
@@ -96,7 +101,7 @@ class removeOverlap(FlowSpec):
             output_path = './output/text_for_ml.pkl'
        
         with open(output_path, "wb") as f:
-            pickle.dump(self.negative_data_filtered.tolist(), f)
+            pickle.dump([self.negative_data_filtered.tolist(), self.selected_negative_pmids.tolist()] , f)
         
 if __name__=="__main__":
     removeOverlap()
