@@ -75,7 +75,7 @@ class processData(FlowSpec):
     @step
     def end(self):
         try:
-            output_path = self.config.output
+            output_path = os.path.expanduser(self.config.output)
         except:
             logging.info('no output file was processed, will proceed with default')
             os.makedirs('./output', exist_ok=True)

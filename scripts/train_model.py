@@ -75,7 +75,7 @@ class trainModel(FlowSpec):
     @step 
     def end(self):
         try:
-           output_model = os.path.abspath( self.config.output_model)
+           output_model = os.path.abspath( os.path.expanduser( self.config.output_model))
            logging.info(f"Output model to {output_model}")
         except :
             os.makedirs('./output', exist_ok=True)
@@ -88,7 +88,7 @@ class trainModel(FlowSpec):
         # ouptut metrics
         # ----------------
         try:
-           output_roc = os.path.abspath(self.config.output_roc_data)
+           output_roc = os.path.abspath( os.path.expanduser( self.config.output_roc_data))
            logging.info(f"Output ROC data to {output_roc}")
            df = pd.DataFrame({"y_test":self.y_test, 
                           "y_pred":self.y_pred, 

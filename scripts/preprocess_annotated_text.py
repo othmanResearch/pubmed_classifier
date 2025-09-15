@@ -13,14 +13,14 @@ from utils import read_input, preprocess_text
 logging.basicConfig(level=logging.INFO)
 
 
-
+ 
 class preprocessAnnotText(FlowSpec):
     
     config = Config('preprocess', required = True)   
 
     @step
     def start(self):
-        dataset = read_input.read_annotated_texts(self.config.annotated_texts)
+        dataset = read_input.read_annotated_texts( self.config.annotated_texts)
         self.annotated_texts = []
         self.pmids = []
         for line in dataset :
@@ -32,7 +32,7 @@ class preprocessAnnotText(FlowSpec):
     @step
     def generate_place_holders(self):
         """ not necessary but the user can check the list of the generated annotation in the text if they will"""
-        with open(self.config.annotated_texts, "r", encoding="utf-8") as f:
+        with open(os.path.expanduser(self.config.annotated_texts), "r", encoding="utf-8") as f:
             text = f.read()
         unique_place_holders = read_input.extract_placeholders(text)
         self.next(self.cook_text)
@@ -62,7 +62,7 @@ class preprocessAnnotText(FlowSpec):
         logging.info(f'{nb_texts} texts and pmids will be saved to pickle format')
         
         try:
-            output_path = self.config.output_pkl
+            output_path = os.path.expanduser(self.config.output_pkl)
             logging.info(f"Will output dataset to {self.config.output_pkl}")
         except:
             logging.info('no output file was processed, will proceed with default')

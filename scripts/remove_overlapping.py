@@ -93,7 +93,7 @@ class removeOverlap(FlowSpec):
     @step
     def end(self):
         try:
-            output_path = self.config.output_filtered
+            output_path = os.path.expanduser( self.config.output_filtered)
             logging.info(f"Will output dataset to {self.config.output_filtered}")
         except:
             logging.info('no output file was processed, will proceed with default')

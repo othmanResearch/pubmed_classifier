@@ -3,6 +3,7 @@ import os
 import re
 import pickle
 from collections import Counter
+
 def read_bern2_json(filepath) -> list:
     """
     read a json file containing one or multiple tagged elements
@@ -24,7 +25,8 @@ def scan_json_path(jsondir) -> list:
 
 def read_annotated_texts(annotated_texts_file) -> list:
     """ """
-    with open(annotated_texts_file, 'r') as f:
+    path = os.path.expanduser(annotated_texts_file)
+    with open(path, 'r') as f:
         data = f.readlines()
     return data 
 
@@ -51,7 +53,7 @@ def extract_placeholders(text):
     return counts
 
 def read_pkl(path_to_pkl_file) -> list:
-    with open(path_to_pkl_file, 'rb') as file: 
+    with open( os.path.expanduser( path_to_pkl_file), 'rb') as file: 
         data = pickle.load(file)
     return data
 
