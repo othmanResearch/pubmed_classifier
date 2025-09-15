@@ -5,6 +5,7 @@ import logging
 import joblib
 import pickle
 import pandas as pd 
+import numpy as np 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))    # set before calling internal modules
 from utils import read_input, annotation
@@ -19,11 +20,12 @@ class predictPmids(FlowSpec):
     @step
     def start(self):
         """ load the predictive model and the data """
-        with open(self.config.model_path, "rb") as f:
+        full_path_to_model = os.path.expanduser( self.config.model_path)
+        with open( full_path_to_model, "rb") as f:
             logging.info("Loaading the predictive model")
             self.pipeline = joblib.load(f)
-
-        with open(self.config.prediction_dataset, "rb") as f:
+        full_path_to_data = os.path.expanduser( self.config.prediction_dataset)
+        with open(full_path_to_data, "rb") as f:
             prediction_dataset = pickle.load(f)
             self.texts = prediction_dataset[0]
             self.pmids = prediction_dataset[1]
@@ -39,14 +41,14 @@ class predictPmids(FlowSpec):
     @step
     def end(self):
         try:
-            output = os.path.abspath( self.config.output)
+            output = os.path.expanduser( self.config.output)
             logging.info(f"Output model to {output}")
         except :
             os.makedirs('./output', exist_ok=True)
             output = os.path.abspath('./output/predictions.csv')
             logging.info(f'No output file was specified, will output to {output}')
        
-        df = pd.DataFrame( {"pmids": self.pmids, "pob_class_1": self.probs} )
+        df = pd.DataFrame( {"pmids": self.pmids, "pob_class_1": np.round(self.probs, 2)} )
         df.to_csv(output, index = False)
         
 
