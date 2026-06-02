@@ -1,0 +1,12 @@
+{
+  "cls1": "C:/Users/ghof/pubmed_classifier/.smoke/positive.pkl",
+  "cls2": "C:/Users/ghof/pubmed_classifier/.smoke/negative_filtered.pkl",
+  "test_size": 0.2,
+  "val_size": 0.2,
+  "random_state": 56,
+  "n_splits": 3,
+  "output_model": "C:/Users/ghof/pubmed_classifier/.smoke/model.pkl",
+  "output_roc_data": "C:/Users/ghof/pubmed_classifier/.smoke/probability_data.csv",
+  "mlflow_tracking_uri": "C:/Users/ghof/pubmed_classifier/.smoke/mlruns",
+  "mlflow_experiment": "pubmed_classifier_smoke"
+}
