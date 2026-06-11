@@ -1,0 +1,27 @@
+# Secrets / local env
+.env
+
+# Virtual environment
+.venv/
+venv/
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Test artifacts
+.coverage
+.pytest_cache/
+
+# Metaflow / MLflow local stores
+.metaflow/
+mlruns/
+
+# Pipeline outputs and smoke-test artifacts
+pipline_output/
+output/
+.smoke/
+
+# OS / editor
+.DS_Store
+.ipynb_checkpoints/

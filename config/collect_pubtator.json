@@ -1,0 +1,5 @@
+{
+  "input": "../pipline_output/pmids.txt",
+  "output_dir": "../pipline_output/annotations",
+  "use_bern2_fallback": true
+}

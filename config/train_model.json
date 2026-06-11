@@ -1,7 +1,12 @@
-{"cls1":"../pipline_output/positive.pkl",
-  "cls2":"../output_preprocessing/negative.pkl",
-  "test_size":0.2,
-  "random_state":56,
-  "output_model": "../output_preprocessing/text_class_predictor.pkl", 
-  "output_roc_data":"../output_preprocessing/probability_data.csv"
+{
+  "cls1": "C:/Users/ghof/AGMP/AGMP/data/pipline_agmp_data/positive.pkl",
+  "cls2": "C:/Users/ghof/AGMP/AGMP/data/pipline_agmp_data/negative_filtered.pkl",
+  "test_size": 0.2,
+  "val_size": 0.2,
+  "random_state": 56,
+  "n_splits": 10,
+  "output_model": "C:/Users/ghof/pubmed_classifier/output/text_class_predictor.pkl",
+  "output_roc_data": "C:/Users/ghof/pubmed_classifier/output/probability_data.csv",
+  "mlflow_tracking_uri": "C:/Users/ghof/pubmed_classifier/mlruns",
+  "mlflow_experiment": "pubmed_classifier"
 }

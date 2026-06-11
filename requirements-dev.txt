@@ -1,0 +1,4 @@
+# Dépendances UNIQUEMENT pour les tests (ne pas installer en production)
+pytest            # framework de test
+pytest-mock       # fixture `mocker` pour simuler les pannes proprement
+pytest-cov        # mesure de couverture de code (optionnel)
